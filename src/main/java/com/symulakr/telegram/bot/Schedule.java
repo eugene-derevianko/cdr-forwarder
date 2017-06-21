@@ -32,14 +32,10 @@ public class Schedule {
    int lastId = 0;
 
    @Scheduled(fixedDelay = 10000)
-   public void execute(){
-      System.out.println(repository.findFirstByOrderByIdDesc().getId());
+   public void execute() {
       Cdr last = repository.findFirstByOrderByIdDesc();
       if (lastId < last.getId()) {
-         restTemplate.getForObject("https://api.telegram.org/bot{token}/sendMessage?chat_id={chatId}&text={text}&parse_mode=Markdown", String.class,
-               token,
-               chatId,
-               translator.apply(last));
+         restTemplate.getForObject("https://api.telegram.org/bot{token}/sendMessage?chat_id={chatId}&text={text}&parse_mode=Markdown", String.class, token, chatId, translator.apply(last));
       }
       lastId = last.getId();
    }
