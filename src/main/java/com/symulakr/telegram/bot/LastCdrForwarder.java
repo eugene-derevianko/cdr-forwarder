@@ -1,5 +1,6 @@
 package com.symulakr.telegram.bot;
 
+import com.symulakr.telegram.bot.message.MarkdownMessageBuilder;
 import com.symulakr.telegram.bot.model.Cdr;
 import com.symulakr.telegram.bot.task.EveryTenSecondsJob;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,9 @@ public class LastCdrForwarder implements EveryTenSecondsJob {
    private boolean connected = false;
 
    @Autowired
-   public LastCdrForwarder(CdrRepository repository, RestTemplate restTemplate, Function<Cdr, String> translator) {
+   public LastCdrForwarder(CdrRepository repository,
+                           RestTemplate restTemplate,
+                           Function<Cdr, String> translator) {
       this.repository = repository;
       this.restTemplate = restTemplate;
       this.translator = translator;
@@ -38,13 +41,13 @@ public class LastCdrForwarder implements EveryTenSecondsJob {
    @Override
    public void doIt() {
       if (connected) {
-         forwarrdLastCdr();
+         forwardLastCdr();
       } else {
          waitConnection();
       }
    }
 
-   private void forwarrdLastCdr() {
+   private void forwardLastCdr() {
       try {
          Cdr last = repository.findFirstByOrderByIdDesc();
          if (lastId < last.getId()) {
@@ -58,13 +61,20 @@ public class LastCdrForwarder implements EveryTenSecondsJob {
 
    private void waitConnection() {
       try {
-         long count = repository.count();
-         sendMessage("_Connected to database._\nFound *" + count + "* records.");
+         sendMessage(MarkdownMessageBuilder.builder()
+             .italic("Connected to database.")
+             .lineFeed()
+             .append("Found ")
+             .bold(repository.count())
+             .append(" records.")
+             .build());
          connected = true;
       } catch (NestedRuntimeException e) {
          if (connected) {
-            sendMessage("*Can't connect to database.*");
-         }
+            sendMessage(MarkdownMessageBuilder.builder()
+                .bold("Can't connect to database.")
+                .build());
+            }
          connected = false;
       }
    }
