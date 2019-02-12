@@ -1,4 +1,4 @@
-package com.symulakr.telegram.bot;
+package com.symulakr.telegram.bot.repository;
 
 import com.symulakr.telegram.bot.model.Cdr;
 import org.springframework.data.jpa.repository.JpaRepository;

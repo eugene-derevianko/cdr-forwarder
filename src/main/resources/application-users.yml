@@ -1,0 +1,8 @@
+configuration:
+  users:
+    -
+      id: sip-user-id
+      chatId: ------------
+    -
+      id: another-sip-user-id
+      chatId: ------------
